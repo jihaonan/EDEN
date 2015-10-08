@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.liaoyb.ssm.mapper.MusicMapperCustom" >
+	<resultMap type="com.liaoyb.ssm.po.MusicCustom" id="MusicCustomById">
+		<id column="id" property="id"></id>
+		<result column="url" property="url"/>
+		<result column="fileid" property="fileid"/>
+		<association property="file" javaType="com.liaoyb.ssm.po.Myfile" select="com.liaoyb.ssm.mapper.MyfileMapper.selectByPrimaryKey" column="fileid">	
+		</association>
+	</resultMap>
+
+	<select id="findMusicCustomById" resultMap="MusicCustomById" parameterType="java.lang.Integer">
+		select * from music where id=#{id}
+	</select>
+</mapper>

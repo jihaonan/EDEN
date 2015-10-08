@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.liaoyb.ssm.mapper.SongMapperCustom" >
+<!-- 开启二级缓存,必须要先实现序列号接口 -->
+<!--  <cache type="org.mybatis.caches.ehcache.LoggingEhcache"></cache>-->
+
+<sql id="query_songs_where">
+	<if test="songCustom!=null">
+		<if test="songCustom.id!=null">
+			and id=#{songCustom.id}
+		</if>
+		<if test="songCustom.songtitle!=null">
+			and songtitle like '%${songCustom.songtitle}%'
+		</if>
+	</if>
+	<if test="artistCustom!=null">
+		<if test="artistCustom.id!=null">
+			and id in (select songid from song_artist where artistid=#{artistCustom.id})
+		</if>
+		<if test="artistCustom.name!=null">
+			and id in (select songid from song_artist,artist  where song_artist.artistid=artist.id and name like '%${artistCustom.name}%')
+		</if>
+	</if>
+</sql>
+
+
+<resultMap type="com.liaoyb.ssm.po.SongCustom" id="songs">
+	<id column="id" property="id"></id>
+	<result column="songtitle" property="songtitle"/>
+	<result column="releasetime" property="releasetime"/>
+	<result column="info" property="info"/>
+	<result column="playcount" property="playcount"/>
+	<result column="collectcount" property="collectcount"/>
+	<result column="downloadcount" property="downloadcount"/>
+	<result column="musicid" property="musicid"/>
+	<result column="imgid" property="imgid"/>
+	<association property="musicCustom" javaType="com.liaoyb.ssm.po.MusicCustom" select="com.liaoyb.ssm.mapper.MusicMapperCustom.findMusicCustomById" column="musicid">	
+	</association>
+	
+	<association property="imgCustom" javaType="com.liaoyb.ssm.po.ImgCustom" select="com.liaoyb.ssm.mapper.ImgMapperCustom.findImgCustomById" column="imgid">	
+	</association>
+	
+	<collection property="artists" ofType="com.liaoyb.ssm.po.Artist" javaType="java.util.ArrayList"    select="com.liaoyb.ssm.mapper.ArtistMapperCustom.findArtistBySongId" column="id"></collection>
+</resultMap>
+
+
+<select id="findsongs" parameterType="com.liaoyb.ssm.po.SongQueryVo" resultMap="songs">
+		select * from song 
+	<where>
+		<include refid="query_songs_where"></include>
+	</where>
+</select>
+
+
+<select id="findSongCustomsByArtistId" parameterType="java.lang.Integer" resultMap="songs">
+	select * from song where id in(select songid from song_artist where artistid=#{artistid})
+</select>
+
+<select id="findSongCustomsBySonglistId" parameterType="java.lang.Integer" resultMap="songs">
+	select * from song where id in(select songid from song_songlist where songlistid=#{songlistid})
+</select>
+
+ <select id="findPlaylistByUserid" parameterType="java.lang.Integer" resultMap="songs">
+	select * from song where id in (select songid from song_user where userid=#{userid})
+ </select>
+
+<select id="findSongCustomById" parameterType="java.lang.Integer" resultMap="songs">
+	select * from song where id =#{id}
+</select>
+	
+	
+</mapper>

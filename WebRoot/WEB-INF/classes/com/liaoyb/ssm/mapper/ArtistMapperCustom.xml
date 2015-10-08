@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.liaoyb.ssm.mapper.ArtistMapperCustom" >
+
+<resultMap type="com.liaoyb.ssm.po.ArtistCustom" id="ArtistCustomsBySongId">
+	<id column="id" property="id"></id>
+	<result column="name" property="name"/>
+	<result column="birthday" property="birthday"/>
+	<result column="sex" property="sex"/>
+	<result column="imgid" property="imgid"/>
+	<association property="avatar" javaType="com.liaoyb.ssm.po.Img" select="com.liaoyb.ssm.mapper.ImgMapper.selectByPrimaryKey" column="imgid"></association>
+	<collection property="songCustoms" ofType="com.liaoyb.ssm.po.SongCustom" javaType="java.util.ArrayList" select="com.liaoyb.ssm.mapper.SongMapperCustom.findSongCustomsByArtistId" column="id"></collection>
+	
+</resultMap>
+
+<select id="findArtistCustomsBySongId" parameterType="java.lang.Integer" resultMap="ArtistCustomsBySongId">
+	select * from artist where id in (select artistid from song_artist where songid=#{songid})
+</select>
+
+
+<select id="findArtistBySongId" parameterType="java.lang.Integer" resultType="com.liaoyb.ssm.po.Artist">
+	select * from artist where id in (select artistid from song_artist where songid=#{songid})
+</select>
+
+<select id="findArtistCustomByid" parameterType="java.lang.Integer" resultMap="ArtistCustomsBySongId">
+	select * from artist where id=#{id}
+</select>
+
+
+</mapper>

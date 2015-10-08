@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.liaoyb.ssm.mapper.SonglistMapperCustom" >
+
+	<resultMap type="com.liaoyb.ssm.po.SonglistCustom" id="CreateSonglistsByUserid">
+		<id column="id" property="id"/>
+		<result column="listname" property="listname"/>
+		<result column="listinfo" property="listinfo"/>
+		<result column="collectcount" property="collectcount"/>
+		<result column="userid" property="userid"/>
+		<association property="user" javaType="com.liaoyb.ssm.po.User" select="com.liaoyb.ssm.mapper.UserMapper.selectByPrimaryKey" column="userid"></association>
+		<collection property="songCustoms" ofType="com.liaoyb.ssm.po.SongCustom" javaType="java.util.ArrayList" select="com.liaoyb.ssm.mapper.SongMapperCustom.findSongCustomsBySonglistId" column="id"></collection>
+	</resultMap>
+	<select id="findCreateSonglistsByUserid"  parameterType="java.lang.Integer" resultMap="CreateSonglistsByUserid">
+		select * from songlist where userid=#{userid}
+	</select>
+	
+	
+	<select id="findCollectSonglistByUserid" parameterType="java.lang.Integer" resultMap="CreateSonglistsByUserid">
+		select * from songlist where id in (select songlistid from collect_songlist where userid=#{userid})
+	</select>
+	
+	
+</mapper>
